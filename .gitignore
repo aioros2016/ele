@@ -1,0 +1,11 @@
+.DS_S
+tore
+
+node_modules/
+
+resource/
+dist/
+
+npm-debug.log
+
+yarn-error.log
