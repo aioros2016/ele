@@ -30,7 +30,7 @@
 					<Viewsplit v-show="item.info"></Viewsplit>
 					<div class="rating">
 						<h2 class="title">商品评价</h2>
-						<Viewratingselect :select-type="selectType" :only-content="onlyContent" :desc="desc" :ratings="item.ratings"></Viewratingselect>
+						<Viewratingselect :select-type="selectType" :only-content="onlyContent" :desc="desc" :ratings="item.ratings" @select-type="innerSelect" @only-content="innerContent"></Viewratingselect>
 					</div>
 					<div class="rating-wrapper">
 						<ul v-show="item.ratings && item.ratings.length">
@@ -39,14 +39,14 @@
 									<span class="name">{{item.username}}</span>
 									<img class="avatar" width="12" height="12" :src="item.avatar" />
 								</div>
-								<div class="time">{{item.rateTime}}</div>
+								<div class="time">{{item.rateTime | formatDate}}</div>
 								<p class="text">
 									<i :class="{'icon-thumb_up': item.rateType === 0, 'icon-thumb_down': item.rateType === 1}"></i>
 									{{item.text}}
 								</p>
 							</li>
 						</ul>
-						<div class="no-rating" v-show="!item.ratings || !item.ratings.length"></div>
+						<div class="no-rating" v-show="!item.ratings || !item.ratings.length">暂无评价</div>
 					</div>
 				</div>
 			</div>
@@ -60,8 +60,7 @@
 	import Viewcartcontrol from "../../components/cartcontrol/Cartcontrol.vue";
 	import Viewsplit from "../../components/split/Split.vue";
 	import Viewratingselect from "../../components/ratingselect/Ratingselect.vue";
-	const POSITIVE = 0;
-	const NEGATIVE = 1;
+	import {formatDate} from "../../assets/js/date.js";
 	const ALL = 2;
 	
 	export default {
@@ -88,13 +87,13 @@
 				this.$nextTick(() => {
 					this.scroll.refresh();
 				})
-			}),
+			});
 			this.$root.eventHub.$on('content.toggle', (onlyContent) => {
 				this.onlyContent = onlyContent;
 				this.$nextTick(() => {
 					this.scroll.refresh();
 				})
-			})
+			});
 		},
 		components: {
 			Viewcartcontrol,
@@ -133,6 +132,18 @@
 				}else {
 					return type === this.selectType;
 				}
+			},
+			innerSelect(data) {
+				this.selectType = data;
+			},
+			innerContent(data) {
+				this.onlyContent = data;
+			}
+		},
+		filters: {
+			formatDate(time) {
+				let date = new Date(time);
+				return formatDate(date, 'yyyy-MM-dd hh:mm');
 			}
 		}
 	}
@@ -220,6 +231,7 @@
 					.icon-thumb_down { color: rgb(147, 153, 159);}
 				}
 			}
+			.no-rating { padding: 16px 0; color: rgb(147, 153, 159); font-size: 12px;}
 		}
 	}
 </style>

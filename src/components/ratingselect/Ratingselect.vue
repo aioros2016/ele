@@ -5,7 +5,7 @@
 			<span :class="{'active':selectType === 0}" class="block positive" @click="select(0, $event)">{{desc.positive}}<em class="count">{{positive.length}}</em></span>
 			<span :class="{'active':selectType === 1}" class="block negative" @click="select(1, $event)">{{desc.negative}}<em class="count">{{negative.length}}</em></span>
 		</div>
-		<div :class="{'on':onlyContent === true}" class="switch" @click="toggleContent($event)">
+		<div :class="{'on':toOnlyContent === true}" class="switch" @click="toggleContent($event)">
 			<i class="icon-check_circle"></i>
 			<span class="text">只看有内容的评价</span>
 		</div>
@@ -44,6 +44,11 @@
 				}
 			}
 		},
+		data() {
+			return {
+				toOnlyContent: this.onlyContent
+			}
+		},
 		computed: {
 			positive() {
 				return this.ratings.filter((rating) => {
@@ -59,13 +64,14 @@
 		methods: {
 			select(type, event) {
 				if(!event._constructed) return;
-				this.selectType = type;
+				this.$emit('selectType', type);
 				this.$root.eventHub.$emit('ratingType.select', type);
 			},
 			toggleContent(event) {
 				if(!event._constructed) return;
-				this.onlyContent = !this.onlyContent;
-				this.$root.eventHub.$emit('content.toggle', this.onlyContent);
+				this.toOnlyContent = !this.toOnlyContent;
+				this.$emit('onlyContent', this.toOnlyContent);
+				this.$root.eventHub.$emit('content.toggle', this.toOnlyContent);
 			}
 		}
 	}

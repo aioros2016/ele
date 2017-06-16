@@ -91,7 +91,6 @@
 		},
 		created() {
 			this.classMap = ['decrease', 'discount', 'special', 'invoice', 'guarantee'];
-			console.log(this);
 			var _this = this;
 			this.$http.get('../data.json').then(function(res){
 				_this.goods = res.data.goods;
