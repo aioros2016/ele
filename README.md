@@ -23,24 +23,24 @@ vue2 + vue-cli + vue-router + webpack + ES6 + axios + less + flex + iconfont
 
 	|-- static                           // 通用静态资源目录
 	|-- src                              // 源码目录
-	|	|-- assets                       // 项目静态资源
+	|	|-- assets                   // 项目静态资源
 	|           |-- fonts                // iconfont目录
 	|           |-- js           	     // 项目静态脚本目录
 	|           |-- less                 // less目录
-	|	|-- components                   // 组件
+	|	|-- components               // 组件
 	|           |-- cartcontrol          // 购物车控件没目录
 	|           |-- detail               // 商品详情目录
 	|           |-- goods                // 店铺商品列表目录
-	|           |-- header          	 // 店铺头部目录
+	|           |-- header               // 店铺头部目录
 	|           |-- ratings              // 店铺评价目录
 	|           |-- ratingselect         // 商品评价控件目录
 	|           |-- seller               // 商家目录
 	|           |-- shopcart             // 购物车目录
 	|           |-- split                // 分割线目录
 	|           |-- star                 // 五星打分控件目录
-	|	|-- App.vue                      // 页面入口文件
-	|	|-- main.js                      // 程序入口文件，加载各种公共组件
-	|	|-- routeConfig.js               // 路由配置文件
+	|	|-- App.vue                  // 页面入口文件
+	|	|-- main.js                  // 程序入口文件，加载各种公共组件
+	|	|-- routeConfig.js           // 路由配置文件
 	|-- .babelrc                         // ES6语法编译配置
 	|-- .gitignore                       // 忽略的文件
 	|-- index.html                       // 入口html文件
