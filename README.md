@@ -49,7 +49,7 @@ vue2 + vue-cli + vue-router + webpack + ES6 + axios + less + flex + iconfont
 	|-- package.json                     // 项目及工具的依赖配置文件
 	|-- postcss.config.js                // postcss配置文件
 	|-- README.md                        // 说明
-	
+
 
 ## 项目安装
 
