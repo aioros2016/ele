@@ -82,18 +82,12 @@
 			}
 		},
 		created() {
-			this.$root.eventHub.$on('ratingType.select', (type) => {
-				this.selectType = type;
-				this.$nextTick(() => {
-					this.scroll.refresh();
-				})
-			});
-			this.$root.eventHub.$on('content.toggle', (onlyContent) => {
-				this.onlyContent = onlyContent;
-				this.$nextTick(() => {
-					this.scroll.refresh();
-				})
-			});
+			this.ratingType();
+			this.toggleOnly();
+		},
+		mounted() {
+			this.ratingType();
+			this.toggleOnly();
 		},
 		components: {
 			Viewcartcontrol,
@@ -138,6 +132,42 @@
 			},
 			innerContent(data) {
 				this.onlyContent = data;
+			},
+			ratingType() {
+				this.$root.eventHub.$on('ratingType.select', (type) => {
+					this.selectType = type;
+					this.$nextTick(() => {
+						if(!this.scroll) {
+							this.$nextTick(() => {
+								this.scroll = new BScroll(this.$refs.item, {
+									click: true
+								});
+							})
+						}else {
+							this.$nextTick(() => {
+								this.scroll.refresh();
+							})
+						}
+					})
+				});
+			},
+			toggleOnly() {
+				this.$root.eventHub.$on('content.toggle', (onlyContent) => {
+					this.onlyContent = onlyContent;
+					this.$nextTick(() => {
+						if(!this.scroll) {
+							this.$nextTick(() => {
+								this.scroll = new BScroll(this.$refs.item, {
+									click: true
+								});
+							})
+						}else {
+							this.$nextTick(() => {
+								this.scroll.refresh();
+							})
+						}
+					})
+				});
 			}
 		},
 		filters: {
@@ -171,8 +201,10 @@
 			.back {
 				position: absolute;
 				top: 10px;
-				left: 0;
-				.icon-arrow_lift { display: block; padding: 10px; color: #fff; font-size: 20px;}
+				left: 10px;
+				background-color: rgba(0, 0, 0, .7);
+				border-radius: 50%;
+				.icon-arrow_lift { display: block; padding: 8px; color: #fff; font-size: 16px;}
 			}
 		}
 		.content {

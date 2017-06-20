@@ -3,10 +3,8 @@ import App from './App.vue'
 import VueRouter from 'vue-router'
 import axios from 'axios'
 import routes from './routeConfig.js'
-import store from './store'
 
 import './assets/less/index.less';
-//require('./assets/less/style.less');
 
 Vue.use(VueRouter);
 const router=new VueRouter({
@@ -33,7 +31,6 @@ Vue.prototype.$http = axios;
 
 new Vue({
   el: '#app',
-  store,
   router,
   render: h => h(App),
   data: {

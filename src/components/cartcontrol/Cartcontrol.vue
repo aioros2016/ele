@@ -12,7 +12,6 @@
 
 <script>
 	import Vue from 'vue';
-	import {mapGetters, mapActions} from 'vuex'
 	
 	export default {
 		props: {

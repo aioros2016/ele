@@ -15,6 +15,7 @@
 </template>
 
 <script>
+	import {urlParse} from './assets/js/util.js'
 	import ViewHeader from './components/header/Header.vue'
 	export default {
 	  name: 'app',
@@ -35,15 +36,19 @@
 	    		'title': '商家',
 	    		'link': 'Seller'
 	    	}],
-	    	seller: {}
+	    	seller: {
+	    		id: (() => {
+	    			let queryParam = urlParse();
+	    			return queryParam.id;
+	    		})()
+	    	}
 	    }
 	  },
 	  created() {
 			var _this = this
-			this.$http.get('../data.json').then(function(res){
-				_this.seller = res.data.seller;
+			this.$http.get('../data.json?id='+ this.seller.id).then(function(res){
+				_this.seller = Object.assign({}, _this.seller, res.data.seller);
 				_this.goods = res.data.goods;
-				console.log(_this.goods);
 			}).catch(function(err){
 				console.log(err);
 			});
