@@ -38,9 +38,9 @@ vue2 + vue-cli + vue-router + webpack + ES6 + axios + less + flex + iconfont
 	|           |-- shopcart             // 购物车目录
 	|           |-- split                // 分割线目录
 	|           |-- star                 // 五星打分控件目录
-	|   |-- App.vue                      // 页面入口文件
-	|   |-- main.js                      // 程序入口文件，加载各种公共组件
-	|   |-- routeConfig.js               // 路由配置文件
+	|	|-- App.vue                      // 页面入口文件
+	|	|-- main.js                      // 程序入口文件，加载各种公共组件
+	|	|-- routeConfig.js               // 路由配置文件
 	|-- .babelrc                         // ES6语法编译配置
 	|-- .gitignore                       // 忽略的文件
 	|-- index.html                       // 入口html文件
