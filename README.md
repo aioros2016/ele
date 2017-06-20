@@ -58,7 +58,7 @@ npm install
 
 ## 本地运行
 
-# 开启服务器，浏览器访问 http://localhost:8080
+// 开启服务器，浏览器访问 http://localhost:8080
 npm run dev
 
 
