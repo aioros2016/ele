@@ -17,6 +17,7 @@
 <script>
 	import {urlParse} from './assets/js/util.js'
 	import ViewHeader from './components/header/Header.vue'
+	
 	export default {
 	  name: 'app',
 	  components:{

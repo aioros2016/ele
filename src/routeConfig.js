@@ -17,10 +17,10 @@ export default [
 	},
 	{ 
 		path: '/', 
-		redirect: '/Index' 
+		redirect: '/Goods' 
 	},
 	{ 
 	    path: '*',
-	    redirect: '/Index'
+	    redirect: '/Goods'
 	}
 ];
