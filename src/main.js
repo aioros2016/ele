@@ -9,7 +9,6 @@ import './assets/less/index.less';
 Vue.use(VueRouter);
 const router=new VueRouter({
 	routes,
-	mode: 'history',
 	scrollBehavior (to, from, savedPosition) {
 		// 如果你的連結是帶 # 這種
 		// to.hash 就會有值(值就是連結)

@@ -77,7 +77,7 @@
 			}
 		},
 		created() {
-			this.$http.get('../data.json').then((res) => {
+			this.$http.get('./data.json').then((res) => {
 				this.ratings = res.data.ratings;
 				this.$nextTick(() => {
 					this.scroll = new BScroll(this.$refs.ratings, {
