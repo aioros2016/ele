@@ -17,7 +17,7 @@
 ## 在线预览
 
 您可以扫描以下二维码或者点击链接来预览页面效果<br />
-![扫描二维码](http://lizhigang.cn/ele/qr-code.jpg)<br />
+![扫描二维码](https://github.com/aioros2016/ele/blob/master/qr-code.jpg)<br />
 <a href="http://lizhigang.cn/ele" target="_blank">点我预览</a>
 
 
