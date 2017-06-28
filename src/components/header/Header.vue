@@ -87,8 +87,6 @@
 				popup: false
 			}
 		},
-		mounted(){
-		},
 		methods: {
 			showDetail() {
 				this.popup = true;

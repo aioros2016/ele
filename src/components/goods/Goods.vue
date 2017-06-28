@@ -94,6 +94,7 @@
 			var _this = this;
 			this.$http.get('./data.json').then(function(res){
 				_this.goods = res.data.goods;
+//				_this.$store.state.goods = res.data.goods;
 				_this.$nextTick(() => {
 					_this.initScroll();
 					_this.calculation();

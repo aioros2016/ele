@@ -1,11 +1,11 @@
 <template>
 	<div class="ratingSelect">
 		<div class="ratingType border-1px">
-			<span :class="{'active':selectType === 2}" class="block positive" @click="select(2, $event)">{{desc.all}}<em class="count">{{ratings.length}}</em></span>
-			<span :class="{'active':selectType === 0}" class="block positive" @click="select(0, $event)">{{desc.positive}}<em class="count">{{positive.length}}</em></span>
-			<span :class="{'active':selectType === 1}" class="block negative" @click="select(1, $event)">{{desc.negative}}<em class="count">{{negative.length}}</em></span>
+			<span :class="{'active':objHub.selectType === 2}" class="block positive" @click="select(2, $event)">{{objHub.desc.all}}<em class="count">{{ratings.length}}</em></span>
+			<span :class="{'active':objHub.selectType === 0}" class="block positive" @click="select(0, $event)">{{objHub.desc.positive}}<em class="count">{{positive.length}}</em></span>
+			<span :class="{'active':objHub.selectType === 1}" class="block negative" @click="select(1, $event)">{{objHub.desc.negative}}<em class="count">{{negative.length}}</em></span>
 		</div>
-		<div :class="{'on':toOnlyContent === true}" class="switch" @click="toggleContent($event)">
+		<div :class="{'on':objHub.onlyContent === true}" class="switch" @click="toggleContent($event)">
 			<i class="icon-check_circle"></i>
 			<span class="text">只看有内容的评价</span>
 		</div>
@@ -25,29 +25,12 @@
 					return [];
 				}
 			},
-			selectType: {
-				type: Number,
-				default: ALL
-			},
-			onlyContent: {
-				type: Boolean,
-				default: false
-			},
-			desc: {
-				type: Object,
-				default() {
-					return {
-						all: '全部',
-						positive: '满意',
-						negative: '不满意'
-					}
-				}
+			objHub: {
+				type: Object
 			}
 		},
-		data() {
-			return {
-				toOnlyContent: this.onlyContent
-			}
+		mounted() {
+			console.log(this.objHub)
 		},
 		computed: {
 			positive() {
@@ -64,14 +47,13 @@
 		methods: {
 			select(type, event) {
 				if(!event._constructed) return;
-				this.$emit('selectType', type);
+				this.objHub.selectType = type;
 				this.$root.eventHub.$emit('ratingType.select', type);
 			},
 			toggleContent(event) {
 				if(!event._constructed) return;
-				this.toOnlyContent = !this.toOnlyContent;
-				this.$emit('onlyContent', this.toOnlyContent);
-				this.$root.eventHub.$emit('content.toggle', this.toOnlyContent);
+				this.objHub.onlyContent = !this.objHub.onlyContent;
+				this.$root.eventHub.$emit('content.toggle', this.objHub.onlyContent);
 			}
 		}
 	}

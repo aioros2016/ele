@@ -47,7 +47,9 @@
 	  },
 	  created() {
 			var _this = this
-			this.$http.get('./data.json?id='+ this.seller.id).then(function(res){
+			
+			// /waimai/ajax/newm/menu?dpShopId=15123172&_token=12 接口地址
+			this.$http.get('./data.json').then((res) => {
 				_this.seller = Object.assign({}, _this.seller, res.data.seller);
 				_this.goods = res.data.goods;
 			}).catch(function(err){

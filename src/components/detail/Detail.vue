@@ -1,11 +1,11 @@
 <template>
 	<div class="detail">
-		<transition name="move-to-left">
+		<span class="top-back" v-show="showBack" @click="hide"><i class="icon-arrow_lift"></i></span>
+		<transition name="move-to-left" @after-enter="afterEnter">
 			<div class="detail-wrapper" v-show="showFlag" ref="item">
 				<div class="detail-content">
 					<div class="img-header">
 						<img :src="item.image" />
-						<span class="back" @click="hide"><i class="icon-arrow_lift"></i></span>
 					</div>
 					<div class="content">
 						<h3 class="title">{{item.name}}</h3>
@@ -30,7 +30,7 @@
 					<Viewsplit v-show="item.info"></Viewsplit>
 					<div class="rating">
 						<h2 class="title">商品评价</h2>
-						<Viewratingselect :select-type="selectType" :only-content="onlyContent" :desc="desc" :ratings="item.ratings" @select-type="innerSelect" @only-content="innerContent"></Viewratingselect>
+						<Viewratingselect :objHub="objHub" :ratings="item.ratings"></Viewratingselect>
 					</div>
 					<div class="rating-wrapper">
 						<ul v-show="item.ratings && item.ratings.length">
@@ -72,12 +72,15 @@
 		data() {
 			return {
 				showFlag: false,
-				selectType: ALL,
-				onlyContent: true,
-				desc: {
-					all: '全部',
-					positive: '推荐',
-					negative: '吐槽'
+				showBack: false,
+				objHub: {
+					selectType: ALL,
+					onlyContent: true,
+					desc: {
+						all: '全部',
+						positive: '推荐',
+						negative: '吐槽'
+					}
 				}
 			}
 		},
@@ -97,8 +100,8 @@
 		methods: {
 			show() {
 				this.showFlag = true;
-				this.selectType = ALL;
-				this.onlyContent = true;
+				this.objHub.selectType = ALL;
+				this.objHub.onlyContent = true;
 				this.$nextTick(() => {
 					if(!this.scroll) {
 						this.scroll = new BScroll(this.$refs.item, {
@@ -110,6 +113,7 @@
 				})
 			},
 			hide() {
+				this.showBack = false;
 				this.showFlag = false;
 			},
 			addFirst(event) {
@@ -118,24 +122,24 @@
 				Vue.set(this.item, 'count', 1);
 			},
 			needShow(type, text) {
-				if(this.onlyContent && !text) {
+				if(this.objHub.onlyContent && !text) {
 					return false;
 				}
-				if(this.selectType === ALL) {
+				if(this.objHub.selectType === ALL) {
 					return true;
 				}else {
-					return type === this.selectType;
+					return type === this.objHub.selectType;
 				}
 			},
 			innerSelect(data) {
-				this.selectType = data;
+				this.objHub.selectType = data;
 			},
 			innerContent(data) {
-				this.onlyContent = data;
+				this.objHub.onlyContent = data;
 			},
 			ratingType() {
 				this.$root.eventHub.$on('ratingType.select', (type) => {
-					this.selectType = type;
+					this.objHub.selectType = type;
 					this.$nextTick(() => {
 						if(!this.scroll) {
 							this.$nextTick(() => {
@@ -153,7 +157,7 @@
 			},
 			toggleOnly() {
 				this.$root.eventHub.$on('content.toggle', (onlyContent) => {
-					this.onlyContent = onlyContent;
+					this.objHub.onlyContent = onlyContent;
 					this.$nextTick(() => {
 						if(!this.scroll) {
 							this.$nextTick(() => {
@@ -168,7 +172,10 @@
 						}
 					})
 				});
-			}
+			},
+			afterEnter(el){
+                this.showBack = true;
+            }
 		},
 		filters: {
 			formatDate(time) {
@@ -182,6 +189,15 @@
 <style lang="less">
 	@import "../../assets/less/mixin.less";
 	
+	.top-back {
+		position: fixed;
+		top: 10px;
+		left: 10px;
+		z-index: 9;
+		background-color: rgba(0, 0, 0, .7);
+		border-radius: 50%;
+		.icon-arrow_lift { display: block; padding: 8px; color: #fff; font-size: 16px;}
+	}
 	.detail-wrapper {
 		position: fixed;
 		top: 0;
@@ -198,14 +214,6 @@
 			height: 0;
 			padding-top: 100%;
 			img { position: absolute; top: 0; left: 0; width: 100%; height: 100%;}
-			.back {
-				position: absolute;
-				top: 10px;
-				left: 10px;
-				background-color: rgba(0, 0, 0, .7);
-				border-radius: 50%;
-				.icon-arrow_lift { display: block; padding: 8px; color: #fff; font-size: 16px;}
-			}
 		}
 		.content {
 			position: relative;

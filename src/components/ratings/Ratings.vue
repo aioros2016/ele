@@ -25,7 +25,7 @@
 				</div>
 			</div>
 			<Viewsplit></Viewsplit>
-			<Viewratingselect :select-type="selectType" :only-content="onlyContent" :ratings="ratings" @select-type="innerSelect" @only-content="innerContent"></Viewratingselect>
+			<Viewratingselect :objHub="objHub" :ratings="ratings"></Viewratingselect>
 			<div class="rating-wrapper">
 				<ul>
 					<li class="rating-item" v-for="(item, index) in ratings" v-show="needShow(item.rateType, item.text)">
@@ -71,8 +71,15 @@
 		},
 		data() {
 			return {
-				selectType: ALL,
-				onlyContent: true,
+				objHub: {
+					selectType: ALL,
+					onlyContent: true,
+					desc: {
+						all: '全部',
+						positive: '满意',
+						negative: '不满意'
+					}
+				},
 				ratings: []
 			}
 		},
@@ -86,13 +93,13 @@
 				})
 			});
 			this.$root.eventHub.$on('ratingType.select', (type) => {
-				this.selectType = type;
+				this.objHub.selectType = type;
 				this.$nextTick(() => {
 					this.scroll.refresh();
 				})
 			});
 			this.$root.eventHub.$on('content.toggle', (onlyContent) => {
-				this.onlyContent = onlyContent;
+				this.objHub.onlyContent = onlyContent;
 				this.$nextTick(() => {
 					this.scroll.refresh();
 				})
@@ -100,20 +107,20 @@
 		},
 		methods: {
 			needShow(type, text) {
-				if(this.onlyContent && !text) {
+				if(this.objHub.onlyContent && !text) {
 					return false;
 				}
-				if(this.selectType === ALL) {
+				if(this.objHub.selectType === ALL) {
 					return true;
 				}else {
-					return type === this.selectType;
+					return type === this.objHub.selectType;
 				}
 			},
 			innerSelect(data) {
-				this.selectType = data;
+				this.objHub.selectType = data;
 			},
 			innerContent(data) {
-				this.onlyContent = data;
+				this.objHub.onlyContent = data;
 			}
 		},
 		filters: {

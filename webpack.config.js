@@ -1,5 +1,6 @@
 var path = require('path')
 var webpack = require('webpack')
+var WebpackDevServer = require('webpack-dev-server');
 
 module.exports = {
   entry: './src/main.js',
@@ -56,8 +57,15 @@ module.exports = {
     }
   },
   devServer: {
-    historyApiFallback: true,
-    noInfo: true
+//		proxy: {
+//			'/waimai': {
+//				target: 'https://takeaway.dianping.com',
+//		    changeOrigin: true,
+//		    secure: false
+//			}
+//		},
+		historyApiFallback: true,
+		noInfo: true
   },
   performance: {
     hints: false

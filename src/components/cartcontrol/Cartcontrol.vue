@@ -27,8 +27,6 @@
 				default: 0
 			}
 		},
-		created() {
-		},
 		methods: {
 			addCount(event) {
 				if(!event._constructed) return;
