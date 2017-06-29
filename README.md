@@ -41,7 +41,7 @@ vue2 + vue-cli + vue-router + webpack + ES6 + axios + less + flex + iconfont
 	|-- src                              // 源码目录
 	|   |-- assets                       // 项目静态资源
 	|      |-- fonts                     // iconfont目录
-	|      |-- js           	     // 项目静态脚本目录
+	|      |-- js                        // 项目静态脚本目录
 	|      |-- less                      // less目录
 	|   |-- components                   // 组件
 	|      |-- cartcontrol               // 购物车控件没目录
