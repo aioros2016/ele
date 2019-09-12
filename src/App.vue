@@ -1,82 +1,71 @@
 <template>
   <div id="app">
-    <ViewHeader :seller="seller"></ViewHeader>
-    <nav>
-    	<ul class="nav-list">
-    		<router-link class="nav-item" :to="item.link" tag="li" v-for="(item, index) in nav">
-    			<a href="javascript:;">{{item.title}}</a>
-    		</router-link>
-    	</ul>
-    </nav>
-    <keep-alive>
-    	<router-view class="router-view" :seller="seller"></router-view>
-		</keep-alive>
+    <v-header :seller="seller"></v-header>
+    <div class="tab-wrapper">
+      <tab :tabs="tabs" :initial-index="0"></tab>
+    </div>
   </div>
 </template>
 
-<script>
-	import {urlParse} from './assets/js/util.js'
-	import ViewHeader from './components/header/Header.vue'
-	
-	export default {
-	  name: 'app',
-	  components:{
-			ViewHeader
-		},
-	  data () {
-	    return {
-	    	nav: [{
-	    		'title': '商品',
-	    		'link': 'Goods'
-	    	},
-	    	{
-	    		'title': '评价',
-	    		'link': 'Ratings'
-	    	},
-	    	{
-	    		'title': '商家',
-	    		'link': 'Seller'
-	    	}],
-	    	seller: {
-	    		id: (() => {
-	    			let queryParam = urlParse();
-	    			return queryParam.id;
-	    		})()
-	    	}
-	    }
-	  },
-	  created() {
-			var _this = this
-			
-			// /waimai/ajax/newm/menu?dpShopId=15123172&_token=12 接口地址
-			this.$http.get('./data.json').then((res) => {
-				_this.seller = Object.assign({}, _this.seller, res.data.seller);
-				_this.goods = res.data.goods;
-			}).catch(function(err){
-				console.log(err);
-			});
-		}
-	}
-</script>
+<script lang="ts">
+import { Component, Vue, Provide } from 'vue-property-decorator'
+import VHeader from './components/v-header/v-header.vue'
+import Tab from './components/tab/tab.vue'
+import Goods from './components/goods/goods.vue'
+import Ratings from './components/ratings/ratings.vue'
+import Seller from './components/seller/seller.vue'
+import { getSeller } from './api'
 
-<style lang="less">
-	@import "./assets/less/mixin.less";
-	
-	.nav-list {
-		display: flex;
-    width: 100%;
-    height: 40px;
-    line-height: 40px;
-    .border-1px(rgba(7, 17, 27, 0.1));
-    .nav-item {
-    	flex: 1;
-      text-align: center;
-      a {
-      	display: block;
-      	font-size: 14px;
-      	color: rgb(77, 85, 93);
-      }
-      &.router-link-active a { color: rgb(240, 20, 20);}
+@Component({
+  components: {
+    VHeader,
+      Tab
+  }
+})
+export default class App extends Vue {
+    @Provide() seller: any = {}
+
+    // computed
+    get tabs() {
+        return [{
+            label: '商品',
+            component: Goods,
+            data: {
+                seller: this.seller
+            }
+        }, {
+            label: '评论',
+            component: Ratings,
+            data: {
+                seller: this.seller
+            }
+        }, {
+            label: '商家',
+            component: Seller,
+            data: {
+                seller: this.seller
+            }
+        }]
     }
-	}
+
+    // methods
+    _fetchSeller() {
+        getSeller().then((seller) => {
+            this.seller = seller
+        })
+    }
+
+    created() {
+        this._fetchSeller()
+    }
+}
+</script>
+<style lang="stylus">
+  #app
+    .tab-wrapper
+      position: fixed
+      top: 136px
+      left: 0
+      right: 0
+      bottom: 0
 </style>
