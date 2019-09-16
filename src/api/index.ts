@@ -6,13 +6,17 @@
  */
 import { get, AxiosPromise } from './helpers'
 
-interface requestFn {
-  (url?: undefined): AxiosPromise
+interface RequestFn {
+  (params: SellerId): AxiosPromise
 }
 
-const getSeller: requestFn = get('/api/seller')
-const getGoods: requestFn = get('/api/goods')
-const getRatings: requestFn = get('/api/ratings')
+interface SellerId {
+  id: string
+}
+
+const getSeller: RequestFn = get('/api/seller')
+const getGoods: RequestFn = get('/api/goods')
+const getRatings: RequestFn = get('/api/ratings')
 
 export {
   getSeller,

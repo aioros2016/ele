@@ -8,13 +8,14 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue, Provide } from 'vue-property-decorator'
+import { Component, Vue } from 'vue-property-decorator'
 import VHeader from './components/v-header/v-header.vue'
 import Tab from './components/tab/tab.vue'
 import Goods from './components/goods/goods.vue'
 import Ratings from './components/ratings/ratings.vue'
 import Seller from './components/seller/seller.vue'
 import { getSeller } from './api'
+import qs from 'query-string'
 
 @Component({
   components: {
@@ -23,7 +24,9 @@ import { getSeller } from './api'
   }
 })
 export default class App extends Vue {
-    @Provide() seller: any = {}
+    seller: any = {
+        id: qs.parse(location.search).id
+    }
 
     // computed
     get tabs() {
@@ -50,7 +53,9 @@ export default class App extends Vue {
 
     // methods
     _fetchSeller() {
-        getSeller().then((seller) => {
+        getSeller({
+            id: this.seller.id
+        }).then((seller) => {
             this.seller = seller
         })
     }

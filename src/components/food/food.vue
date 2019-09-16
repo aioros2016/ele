@@ -4,7 +4,7 @@
     @after-leave="afterLeave"
   >
     <div class="food" v-show="visible">
-      <cube-scroll ref="scroll">
+      <cube-scroll :data="computedRatings" ref="scroll">
         <div class="food-content">
           <div class="image-header">
             <img :src="food.image">
@@ -38,14 +38,14 @@
           <split></split>
           <div class="rating">
             <h1 class="title">商品评价</h1>
-<!--            <rating-select-->
-<!--              @select="onSelect"-->
-<!--              @toggle="onToggle"-->
-<!--              :selectType="selectType"-->
-<!--              :onlyContent="onlyContent"-->
-<!--              :desc="desc"-->
-<!--              :ratings="ratings">-->
-<!--            </rating-select>-->
+            <rating-select
+              @select="onSelect"
+              @toggle="onToggle"
+              :selectType="selectType"
+              :onlyContent="onlyContent"
+              :desc="desc"
+              :ratings="ratings">
+            </rating-select>
             <div class="rating-wrapper">
               <ul v-show="computedRatings && computedRatings.length">
                 <li
@@ -73,9 +73,9 @@
 </template>
 
 <script type="text/ecmascript-6">
-  // import moment from 'moment'
+  import dayjs from 'dayjs'
   import CartControl from 'components/cart-control/cart-control'
-  // import RatingSelect from 'components/rating-select/rating-select'
+  import RatingSelect from 'components/rating-select/rating-select'
   import Split from 'components/split/split'
   import ratingMixin from 'common/mixins/rating'
   import popupMixin from 'common/mixins/popup'
@@ -125,12 +125,12 @@
         this.$emit(EVENT_ADD, target)
       },
       format(time) {
-        // return moment(time).format('YYYY-MM-DD hh:mm')
+        return dayjs(time).format('YYYY-MM-DD hh:mm')
       }
     },
     components: {
       CartControl,
-      // RatingSelect,
+      RatingSelect,
       Split
     }
   }

@@ -137,8 +137,7 @@
       fetch() {
         if (!this.fetched) {
           this.fetched = true
-          getGoods().then((goods) => {
-            console.log(goods)
+          getGoods({ id: this.seller.id }).then((goods) => {
             this.goods = goods
           })
         }
@@ -170,7 +169,7 @@
       _showShopCartSticky() {
         this.shopCartStickyComp = this.shopCartStickyComp || this.$createShopCartSticky({
           $props: {
-            selectedFood: 'selectedFood',
+            selectFoods: 'selectFoods',
             deliveryPrice: this.seller.deliveryPrice,
             minPrice: this.seller.minPrice,
             fold: true
