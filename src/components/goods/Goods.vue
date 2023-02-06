@@ -1,239 +1,297 @@
 <template>
-	<div class="goods">
-		<div class="goods-wrapper">
-			<div class="sidebar" ref="sidebar">
-				<ul>
-					<li :class="{'current': currentIndex === index}" class="side-item" v-for="(item, index) in goods" @click="selectedSide(index, $event)">
-						<span class="text border-1px"><i v-show="item.type > 0" :class="classMap[item.type]" class="icon"></i>{{item.name}}</span>
-					</li>
-				</ul>
-			</div>
-			<div class="menu-wrapper" ref="menuWrapper">
-				<ul>
-					<li class="menu-list menu-list-hook" v-for="(list, index) in goods">
-						<h3 class="title">{{list.name}}</h3>
-						<ul>
-							<li class="menu-item border-1px" v-for="(item, index) in list.foods" @click="selectItem(item, $event)">
-								<div class="icon"><img :src="item.icon" width="57" height="57" /></div>
-								<div class="content">
-									<div class="name">{{item.name}}</div>
-									<p class="desc">{{item.description}}</p>
-									<div class="extra">
-										<span class="count">月售{{item.sellCount}}份</span>
-										<span class="praise">好评率{{item.rating}}%</span>
-									</div>
-									<div class="price">
-										<span class="now">¥{{item.price}}</span>
-										<span class="old" v-show="item.oldPrice">¥{{item.oldPrice}}</span>
-									</div>
-									<div class="cartcontrol-wrapper">
-										<Viewcartcontrol :item="item"></Viewcartcontrol>
-									</div>
-								</div>
-							</li>
-						</ul>
-					</li>
-				</ul>
-			</div>
-			<Viewshopcart ref="shopcart" :selected-item="selectedItem" :delivery-price="seller.deliveryPrice" :min-price="seller.minPrice"></Viewshopcart>
-		</div>
-		<Viewdetail :item="showDetail" ref="detail"></Viewdetail>
-	</div>
+  <div class="goods">
+    <div class="scroll-nav-wrapper">
+      <cube-scroll-nav
+        :side=true
+        :data="goods"
+        :options="scrollOptions"
+        v-if="goods.length"
+      >
+        <template slot="bar" slot-scope="props">
+          <cube-scroll-nav-bar
+            direction="vertical"
+            :labels="props.labels"
+            :txts="barTxts"
+            :current="props.current"
+          >
+            <template slot-scope="props">
+              <div class="text">
+                <support-ico
+                  v-if="props.txt.type>=1"
+                  :size=3
+                  :type="props.txt.type"
+                ></support-ico>
+                <span>{{props.txt.name}}</span>
+                <span class="num" v-if="props.txt.count">
+                  <bubble :num="props.txt.count"></bubble>
+                </span>
+              </div>
+            </template>
+          </cube-scroll-nav-bar>
+        </template>
+        <cube-scroll-nav-panel
+          v-for="good in goods"
+          :key="good.name"
+          :label="good.name"
+          :title="good.name"
+        >
+          <ul>
+            <li
+              @click="selectFood(food)"
+              v-for="food in good.foods"
+              :key="food.name"
+              class="food-item"
+            >
+              <div class="icon">
+                <img width="57" height="57" :src="food.icon">
+              </div>
+              <div class="content">
+                <h2 class="name">{{food.name}}</h2>
+                <p class="desc">{{food.description}}</p>
+                <div class="extra">
+                  <span class="count">月售{{food.sellCount}}份</span><span>好评率{{food.rating}}%</span>
+                </div>
+                <div class="price">
+                  <span class="now">￥{{food.price}}</span>
+                  <span class="old" v-show="food.oldPrice">￥{{food.oldPrice}}</span>
+                </div>
+                <div class="cart-control-wrapper">
+                  <cart-control @add="onAdd" :food="food"></cart-control>
+                </div>
+              </div>
+            </li>
+          </ul>
+        </cube-scroll-nav-panel>
+      </cube-scroll-nav>
+    </div>
+    <div class="shop-cart-wrapper">
+      <shop-cart
+        ref="shopCart"
+        :select-foods="selectFoods"
+        :delivery-price="seller.deliveryPrice"
+        :min-price="seller.minPrice"></shop-cart>
+    </div>
+  </div>
 </template>
 
 <script>
-	import BScroll from "better-scroll";
-	import Viewshopcart from "../../components/shopcart/Shopcart.vue";
-	import Viewcartcontrol from "../../components/cartcontrol/Cartcontrol.vue";
-	import Viewdetail from "../../components/detail/Detail.vue";
-	
-	export default {
-		props: {
-			seller: {
-				type: Object
-			}
-		},
-		components: {
-			Viewshopcart,
-			Viewcartcontrol,
-			Viewdetail
-		},
-		data() {
-			return {
-				goods: [],
-				listHeight: [],
-				scrollY: 0,
-				showDetail: {}
-			}
-		},
-		computed: {
-			currentIndex() {
-				for(let i = 0; i < this.listHeight.length; i++){
-					let prev = this.listHeight[i];
-					let next = this.listHeight[i + 1];
-					if(!next || (this.scrollY >= prev && this.scrollY < next)){
-						return i;
-					}
-				}
-				return 0;
-			},
-			selectedItem() {
-				let items = [];
-				this.goods.forEach((good) => {
-					good.foods.forEach((item) => {
-						if(item.count) {
-							items.push(item);
-						}
-					})
-				});
-				return items;
-			}
-		},
-		created() {
-			this.classMap = ['decrease', 'discount', 'special', 'invoice', 'guarantee'];
-			var _this = this;
-			this.$http.get('./data.json').then(function(res){
-				_this.goods = res.data.goods;
-//				_this.$store.state.goods = res.data.goods;
-				_this.$nextTick(() => {
-					_this.initScroll();
-					_this.calculation();
-				});
-			}).catch(function(err){
-				console.log(err);
-			});
-		},
-		methods: {
-			initScroll() {
-				this.sideScroll = new BScroll(this.$refs.sidebar, {
-					click: true
-				});
-				this.menuScroll = new BScroll(this.$refs.menuWrapper, {
-					probeType: 3,
-					click: true
-				});
-				this.menuScroll.on('scroll', (pos) => {
-					this.scrollY = Math.abs(parseInt(pos.y));
-				})
-			},
-			calculation() {
-				let menuList = document.querySelectorAll(".menu-list-hook");
-				let height = 0;
-				this.listHeight.push(height);
-				for(let i = 0; i < menuList.length; i++){
-					let item = menuList[i];
-					height += item.clientHeight;
-					this.listHeight.push(height);
-				}
-			},
-			selectedSide(index, event) {
-				if(!event._constructed) return;
-				let menuList = document.querySelectorAll(".menu-list-hook");
-				let el = menuList[index];
-				this.menuScroll.scrollToElement(el, 300);
-			},
-			cartAdd(target) {
-				
-				// 体验优化，异步执行下落动画
-				this.$nextTick(() => {
-					this.$refs.shopcart.drop(target);
-				});
-			},
-			selectItem(item, event) {
-				if(!event._constructed) return;
-				this.showDetail = item;
-				this.$refs.detail.show();
-			}
-		}
-	}
+  import { getGoods } from 'api'
+  import CartControl from 'components/cart-control/cart-control'
+  import ShopCart from 'components/shop-cart/shop-cart'
+  import Food from 'components/food/food'
+  import SupportIco from 'components/support-ico/support-ico'
+  import Bubble from 'components/bubble/bubble'
+
+  export default {
+    name: 'goods',
+    props: {
+      data: {
+        type: Object,
+        default() {
+          return {}
+        }
+      }
+    },
+    data() {
+      return {
+        goods: [],
+        selectedFood: {},
+        scrollOptions: {
+          click: false,
+          directionLockThreshold: 0
+        }
+      }
+    },
+    computed: {
+      seller() {
+        return this.data.seller
+      },
+      selectFoods() {
+        let foods = []
+        this.goods.forEach((good) => {
+          good.foods.forEach((food) => {
+            if (food.count) {
+              foods.push(food)
+            }
+          })
+        })
+        return foods
+      },
+      barTxts() {
+        let ret = []
+        this.goods.forEach((good) => {
+          const {type, name, foods} = good
+          let count = 0
+          foods.forEach((food) => {
+            count += food.count || 0
+          })
+          ret.push({
+            type,
+            name,
+            count
+          })
+        })
+        return ret
+      }
+    },
+    methods: {
+      fetch() {
+        if (!this.fetched) {
+          this.fetched = true
+          getGoods({
+            id: this.seller.id
+          }).then((goods) => {
+            this.goods = goods
+          })
+        }
+      },
+      selectFood(food) {
+        this.selectedFood = food
+        this._showFood()
+        this._showShopCartSticky()
+      },
+      onAdd(target) {
+        this.$refs.shopCart.drop(target)
+      },
+      _showFood() {
+        this.foodComp = this.foodComp || this.$createFood({
+          $props: {
+            food: 'selectedFood'
+          },
+          $events: {
+            add: (target) => {
+              this.shopCartStickyComp.drop(target)
+            },
+            leave: () => {
+              this._hideShopCartSticky()
+            }
+          }
+        })
+        this.foodComp.show()
+      },
+      _showShopCartSticky() {
+        this.shopCartStickyComp = this.shopCartStickyComp || this.$createShopCartSticky({
+          $props: {
+            selectFoods: 'selectFoods',
+            deliveryPrice: this.seller.deliveryPrice,
+            minPrice: this.seller.minPrice,
+            fold: true
+          }
+        })
+        this.shopCartStickyComp.show()
+      },
+      _hideShopCartSticky() {
+        this.shopCartStickyComp.hide()
+      }
+    },
+    components: {
+      Bubble,
+      SupportIco,
+      CartControl,
+      ShopCart,
+      Food
+    }
+  }
 </script>
 
-<style lang="less">
-	@import "../../assets/less/mixin.less";
-	
-	.goods-wrapper {
-		overflow: hidden;
-		display: flex;
-		position: absolute;
-		top: 174px;
-		bottom: 46px;
-		width: 100%;
-		.sidebar {
-			flex: 0 0 80px;
-			width: 80px;
-			background-color: #f3f5f7;
-			.side-item {
-				display: table;
-				width: 56px;
-				height: 54px;
-				padding: 0 12px; 
-				line-height: 14px;
-				.icon {
-					display: inline-block;
-					margin-right: 2px;
-					width: 12px;
-					height: 12px;
-					background-size: 12px;
-					background-repeat: no-repeat;
-					vertical-align: top;
-					&.decrease { .bg-image('decrease_3');}
-					&.discount { .bg-image('discount_3');}
-					&.guarantee { .bg-image('guarantee_3');}
-					&.invoice { .bg-image('invoice_3');}
-					&.special { .bg-image('special_3');}
-				}
-				.text { display: table-cell; .border-1px(rgba(7, 17, 27, .1)); width: 56px; font-size: 12px; vertical-align: middle;}
-				&.current {
-					position: relative;
-					z-index: 10;
-					margin-top: -1px;
-					background-color: #fff;
-					font-weight: 700;
-					.text { .border-none();}
-				}
-			}
-		}
-		.menu-wrapper {
-			flex: 1;
-			.title {
-				border-left: 2px solid #d9dde1;
-				height: 26px;
-				padding-left: 14px;
-				line-height: 26px;
-				background: #f3f5f7;
-				color: rgb(147, 153, 159);
-				font-size: 12px;
-			}
-			.menu-item {
-				display: flex;
-				margin: 18px;
-				padding-bottom: 18px;
-				.border-1px(rgba(7, 17, 27, .1));
-				&:last-child {
-					.border-none();
-					margin-bottom: 0;
-				}
-				.icon { flex: 0 0 57px; margin-right: 10px;}
-				.content {
-					flex: 1;
-					.name { margin: 2px 0 8px; height: 14px; line-height: 14px; color: rgb(7, 17, 27); font-size: 14px;}
-					.desc, .extra { color: rgb(147, 153, 159); font-size: 10px;}
-					.desc { margin-bottom: 8px; line-height: 12px;}
-					.extra {
-						font-size: 0;
-						.count { margin-right: 12px; font-size: 10px;}
-						.praise { font-size: 10px;}
-					}
-					.price {
-						line-height: 24px;
-						font-size: 0;
-						font-weight: 700px;
-						.now { margin-right: 8px; color: rgb(240, 20, 20); font-size: 14px;}
-						.old { color: rgb(147, 153, 159); font-size: 10px; text-decoration: line-through;}
-					}
-					.cartcontrol-wrapper { position: absolute; bottom: 12px; right: 0;}
-				}
-			}
-		}
-	}
+<style lang="stylus" scoped>
+  @import "~common/stylus/mixin"
+  @import "~common/stylus/variable"
+  .goods
+    position: relative
+    text-align: left
+    height: 100%
+    .scroll-nav-wrapper
+      position: absolute
+      width: 100%
+      top: 0
+      left: 0
+      bottom: 48px
+    >>> .cube-scroll-nav-bar
+      width: 80px
+      white-space: normal
+      overflow: hidden
+    >>> .cube-scroll-nav-bar-item
+      padding: 0 10px
+      display: flex
+      align-items: center
+      height: 56px
+      line-height: 14px
+      font-size: $fontsize-small
+      background: $color-background-ssss
+      .text
+        flex: 1
+        position: relative
+      .num
+        position: absolute
+        right: -8px
+        top: -10px
+      .support-ico
+        display: inline-block
+        vertical-align: top
+        margin-right: 4px
+    >>> .cube-scroll-nav-bar-item_active
+      background: $color-white
+      color: $color-dark-grey
+    >>> .cube-scroll-nav-panel-title
+      padding-left: 14px
+      height: 26px
+      line-height: 26px
+      border-left: 2px solid $color-col-line
+      font-size: $fontsize-small
+      color: $color-grey
+      background: $color-background-ssss
+    .food-item
+      display: flex
+      margin: 18px
+      padding-bottom: 18px
+      position: relative
+      &:last-child
+        border-none()
+        margin-bottom: 0
+      .icon
+        flex: 0 0 57px
+        margin-right: 10px
+        img
+          height: auto
+      .content
+        flex: 1
+        .name
+          margin: 2px 0 8px 0
+          height: 14px
+          line-height: 14px
+          font-size: $fontsize-medium
+          color: $color-dark-grey
+        .desc, .extra
+          line-height: 10px
+          font-size: $fontsize-small-s
+          color: $color-light-grey
+        .desc
+          line-height: 12px
+          margin-bottom: 8px
+        .extra
+          .count
+            margin-right: 12px
+        .price
+          font-weight: 700
+          line-height: 24px
+          .now
+            margin-right: 8px
+            font-size: $fontsize-medium
+            color: $color-red
+          .old
+            text-decoration: line-through
+            font-size: $fontsize-small-s
+            color: $color-light-grey
+      .cart-control-wrapper
+        position: absolute
+        right: 0
+        bottom: 12px
+    .shop-cart-wrapper
+      position: absolute
+      left: 0
+      bottom: 0
+      z-index: 50
+      width: 100%
+      height: 48px
 </style>
